@@ -1,4 +1,10 @@
-//go.mod file must be put in the head/go.mod and if use teh go mod , don't need put code under GOPATH
+//go.mod file must be put in the project/go.mod and if use the go mod , don't need put code under GOPATH
+//indirect, for example, we have angx/ang and the project need the angx/ang/a and angx/ang/b, 
+//there should be indirect invoke
+//cuz we didn't use the angx/ang (we only need angx/ang/a and angx/ang/b which are 'direct' using)
+//so --> 
+//require angx/ang v0.0.0 //indirect (under GOPATH/mod/)
+
 module myproject
 
 go 1.19
