@@ -51,6 +51,7 @@ func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (Tr
 			return err
 		}
 
+		//avoid deadlock by locking in a consistent order(always min ID update first)
 		if arg.FromAccountID < arg.ToAccountID {
 			result.FromAccount, result.ToAccount, err = addMoney(ctx, q, arg.FromAccountID, -arg.Amount, arg.ToAccountID, arg.Amount)
 		} else {
