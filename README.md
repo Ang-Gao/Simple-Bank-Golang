@@ -1,5 +1,5 @@
 # Simple-Bank-Golang
-
+```
 package api
 
 import (
@@ -37,3 +37,4 @@ func (server *Server) CreateAccount(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, account)
 }
+```
