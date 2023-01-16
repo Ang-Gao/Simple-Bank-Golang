@@ -1,4 +1,4 @@
-#Simple bank service
+# Simple bank service
 The service that we’re going to build is a simple bank. It will provide APIs for the frontend to do following things:
 
 Create and manage bank accounts, which are composed of owner’s name, balance, and currency.
