@@ -13,4 +13,6 @@ sqlc:
 test:
 #-v --> verbose(more details) -cover --> coverage(unit test cover how much code) ./... -> ./all package
 	go test -v -cover ./...
+server:
+	go run main.go
 .PHONY: postgres createdb dropdb migrateup migratedown sqlc test

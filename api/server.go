@@ -1,18 +1,34 @@
-package main
+package api
 
 import (
-	"net/http"
+	db "myproject/db/sqlc"
 
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
+type Server struct {
+	store  *db.SQLStore
+	router *gin.Engine
+}
 
-	})
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+func NewServer(store *db.SQLStore) *Server {
+	server := &Server{
+		store: store,
+	}
+	server.setupRouter()
+	return server
+}
+func (server *Server) Start(addr string) error {
+	return server.router.Run(addr)
+}
+
+func (server *Server) setupRouter() {
+	router := gin.Default()
+	server.router = router
+	router.POST("/create_account", server.CreateAccount)
+}
+
+//H is a shortcut for map[string]interface{}
+func errorResponse(err error) gin.H {
+	return gin.H{"error": err.Error()}
 }
