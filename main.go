@@ -5,25 +5,26 @@ import (
 	"log"
 	api "myproject/api"
 	db "myproject/db/sqlc"
+	util "myproject/util"
 
 	_ "github.com/lib/pq" //for driver detected as postgres
 )
 
-const (
-	dbDriver   = "postgres"
-	dbSource   = "postgresql://root:abc123@localhost:5432/simple_bank?sslmode=disable"
-	serverAddr = "localhost:8080"
-)
-
 func main() {
+	//load configuration
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal("config error")
+	}
+
 	//setup connection
-	conn, err := sql.Open(dbDriver, dbSource)
+	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal("Cannot connect to db:", err)
 	}
 	store := db.NewStore(conn)
 	server := api.NewServer(store)
-	err = server.Start(serverAddr)
+	err = server.Start(config.ServerAddr)
 	if err != nil {
 		log.Fatal("Cannot start server:", err)
 	}

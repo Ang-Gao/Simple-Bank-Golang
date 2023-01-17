@@ -3,15 +3,11 @@ package db
 import (
 	"database/sql"
 	"log"
+	util "myproject/util"
 	"os"
 	"testing"
 
 	_ "github.com/lib/pq" //for driver detected as postgres
-)
-
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://root:abc123@localhost:5432/simple_bank?sslmode=disable"
 )
 
 // global var, but only global under same package because the lower case
@@ -19,9 +15,14 @@ var testQueries *Queries
 var testDB *sql.DB
 
 func TestMain(m *testing.M) {
+	//load configuration
+	config, err := util.LoadConfig("../../")
+	if err != nil {
+		log.Fatal("config error")
+	}
+
 	//setup connection
-	var err error
-	testDB, err = sql.Open(dbDriver, dbSource)
+	testDB, err = sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal("Cannot connect to db:", err)
 	}
