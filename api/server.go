@@ -4,6 +4,8 @@ import (
 	db "myproject/db/sqlc"
 
 	"github.com/gin-gonic/gin"
+	binding "github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 type Server struct {
@@ -24,8 +26,13 @@ func (server *Server) Start(addr string) error {
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+	//validate user input
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("supportedCurrency", validCurrency)
+	}
 	server.router = router
 	router.POST("/create_account", server.CreateAccount)
+	router.POST("/transfers", server.CreateTransfer)
 }
 
 //H is a shortcut for map[string]interface{}
