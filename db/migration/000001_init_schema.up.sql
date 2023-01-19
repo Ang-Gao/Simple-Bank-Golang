@@ -1,3 +1,7 @@
+-- up and down schema will be loaded together
+-- so up file and down file will impress each other
+-- there is anything appeared in down, the up file must mention that
+-- e.g. delele fk_a in down, so need create fk_a in up
 CREATE TABLE "accounts" (
   "id" bigserial PRIMARY KEY,
   "owner" varchar NOT NULL,
@@ -20,6 +24,24 @@ CREATE TABLE "transfers" (
   "amount" bigint NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
+
+CREATE TABLE "users" (
+    "username" varchar PRIMARY KEY,
+    "hashed_password" varchar NOT NULL,
+    "full_name" varchar NOT NULL,
+    "email" varchar UNIQUE NOT NULL,
+    "password_changed_at" timestamptz NOT NULL DEFAULT('0001-01-01 00:00:00Z'),  
+    "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+ALTER TABLE "accounts" ADD FOREIGN KEY ("owner") REFERENCES "users" ("username");
+
+CREATE UNIQUE INDEX ON "accounts" ("owner", "currency");
+-- joint unique constraint
+-- ->Alex EUR true
+-- ->Alex USD true
+-- ->Alex USD false
+ALTER TABLE "accounts" ADD CONSTRAINT "owner_currency_key" UNIQUE ("owner", "currency");
 
 ALTER TABLE "entries" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id");
 

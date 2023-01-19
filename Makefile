@@ -5,21 +5,25 @@ postgres:
 createdb:
 	docker exec -it postgres12 createdb --username=root --owner=root simple_bank
 
+dockerstart:
+	docker start postgres12
+
 dropdb:
 	docker exec -it postgres12 dropdb simple_bank
 
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
 
-migrateup1:
-	migrate -path db/migration -database "$(DB_URL)" -verbose up 1
+#migrateup1:
+#migrate -path db/migration -database "$(DB_URL)" -verbose up 1
 
 migratedown:
 	migrate -path db/migration -database "$(DB_URL)" -verbose down
 
-migratedown1:
-	migrate -path db/migration -database "$(DB_URL)" -verbose down 1
+#migratedown1:
+#migrate -path db/migration -database "$(DB_URL)" -verbose down 1
 
+#generate need normal user's permission, not root
 sqlc:
 	sqlc generate
 
@@ -30,4 +34,4 @@ test:
 server:
 	go run main.go
 
-.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedwon1 sqlc test server 
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server 
