@@ -1,8 +1,5 @@
 package db
 
-/*
-package db
-
 import (
 	"context"
 	"database/sql"
@@ -21,7 +18,7 @@ func createRandomUser(t *testing.T) User {
 		Username:       util.RandomOwner(),
 		HashedPassword: hashedPassword,
 		FullName:       util.RandomOwner(),
-		Email:          util.RandomEmail(),
+		Email:          "test@example.com",
 	}
 
 	user, err := testQueries.CreateUser(context.Background(), arg)
@@ -78,7 +75,7 @@ func TestUpdateUserOnlyFullName(t *testing.T) {
 func TestUpdateUserOnlyEmail(t *testing.T) {
 	oldUser := createRandomUser(t)
 
-	newEmail := util.RandomEmail()
+	newEmail := "test@example.com"
 	updatedUser, err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
 		Username: oldUser.Username,
 		Email: sql.NullString{
@@ -120,7 +117,7 @@ func TestUpdateUserAllFields(t *testing.T) {
 	oldUser := createRandomUser(t)
 
 	newFullName := util.RandomOwner()
-	newEmail := util.RandomEmail()
+	newEmail := "test@example.com"
 	newPassword := util.RandomStr(6)
 	newHashedPassword, err := util.HashPassword(newPassword)
 	require.NoError(t, err)
@@ -149,4 +146,3 @@ func TestUpdateUserAllFields(t *testing.T) {
 	require.NotEqual(t, oldUser.FullName, updatedUser.FullName)
 	require.Equal(t, newFullName, updatedUser.FullName)
 }
-*/
