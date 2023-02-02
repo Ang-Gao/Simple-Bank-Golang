@@ -1,50 +1,64 @@
 package api
 
 import (
+	"fmt"
+
 	db "myproject/db/sqlc"
+	"myproject/token"
+	"myproject/util"
 
 	"github.com/gin-gonic/gin"
-	binding "github.com/gin-gonic/gin/binding"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 )
 
+// Server serves HTTP requests for our banking service.
 type Server struct {
-	store  *db.SQLStore
-	router *gin.Engine
+	config     util.Config
+	store      db.Store
+	tokenMaker token.Maker
+	router     *gin.Engine
 }
 
-//create New server
-func NewServer(store *db.SQLStore) *Server {
-	server := &Server{
-		store: store,
+// NewServer creates a new HTTP server and set up routing.
+func NewServer(config util.Config, store db.Store) (*Server, error) {
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
 	}
+
+	server := &Server{
+		config:     config,
+		store:      store,
+		tokenMaker: tokenMaker,
+	}
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("currency", validCurrency)
+	}
+
 	server.setupRouter()
-	return server
+	return server, nil
 }
 
-//server start function
-func (server *Server) Start(addr string) error {
-	return server.router.Run(addr)
-}
-
-//server setup and router path
 func (server *Server) setupRouter() {
 	router := gin.Default()
-	//validate user input
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("supportedCurrency", validCurrency)
-	}
+
+	router.POST("/users", server.createUser)
+	router.POST("/users/login", server.loginUser)
+
+	//use middleware to verify token validity
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes.POST("/accounts", server.CreateAccount)
 
 	server.router = router
-
-	//--------------------------------------------------------------------
-	//Path//
-	router.POST("/create_account", server.CreateAccount)
-	router.POST("/transfers", server.CreateTransfer)
-	//--------------------------------------------------------------------
 }
 
-//H is a shortcut for map[string]interface{}
+// Start runs the HTTP server on a specific address.
+func (server *Server) Start(address string) error {
+	return server.router.Run(address)
+}
+
 func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
 }
