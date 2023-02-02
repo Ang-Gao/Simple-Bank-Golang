@@ -10,7 +10,7 @@ WORKDIR /app
 COPY . .
 RUN go build -o main main.go
 
-# Run stage
+# Run stage including copy config files to the image
 FROM alpine:3.16
 WORKDIR /app
 COPY --from=builder /app/main .
